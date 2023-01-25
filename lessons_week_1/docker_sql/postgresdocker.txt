@@ -20,6 +20,20 @@ docker run -it \
       -p 5432:5432 \
       postgres:13
 
+
+##How to run this with a network
+docker create network #name#
+
+docker run -it \
+      -e POSTGRES_USER="root" \
+      -e POSTGRES_PASSWORD="root" \
+      -e POSTGRES_DB="ny_taxi" \
+      -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
+      -p 5432:5432 \
+      --network=pg-network \
+      --name pg-database \
+      postgres:13
+
 ##comments
 docker pull dpage/pgadmin4 --> used to pull pgadmin which is a GUI tool we can use to talk to our DB
 
@@ -28,16 +42,51 @@ command
 
 docker run -it \
     -e PGADMIN_DEFAULT_EMAIL="admin@admin.com"\
-    -e PGADMIN_DEFAULT_PASSWORD=e"root"\
+    -e PGADMIN_DEFAULT_PASSWORD="root"\
     -p 8080:80 \
     dpage/pgadmin4
+
+
+# Running pgadmin on a docker network
+docker create network #NAME#
 
 docker run -it \
   -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
   -e PGADMIN_DEFAULT_PASSWORD="root" \
   -p 8080:80 \
+   --network=pg-network \
+   --name pgadmin \
   dpage/pgadmin4
 
 
 When working with multiple docker images you will want to create a docker network for the images to talk to each other
 
+
+Once you have converted the juyptier notebook into a a script now we can run the entire ingestion process from the command line
+
+# This will run locally
+URL="https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+python taxi_data_ingestion.py \
+    --user=root \
+    --password=root \
+    --host=localhost \
+    --port=5432 \
+    --db=ny_taxi \
+    --table_name=yellow_taxi_trips \
+    --url=${URL}
+
+
+# This will run the data ingestion script in docker
+docker build -t taxi_ingest:v001 .
+
+URL="https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+docker run  -it \
+        --network=pg-network \
+    taxi_ingest:v001 \
+        --user=root \
+        --password=root \
+        --host=pg-database \
+        --port=5432 \
+        --db=ny_taxi \
+        --table_name=yellow_taxi_trips \
+        --url=${URL}
