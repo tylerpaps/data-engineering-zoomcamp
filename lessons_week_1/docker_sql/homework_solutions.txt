@@ -1,0 +1,65 @@
+Question 1:
+Which tag has the following text? - Write the image ID to the file
+
+--iidfile string :  Write the image ID to the file
+
+Question 2.
+
+Understanding docker first run
+Run docker with the python:3.9 image in an interactive mode and the entrypoint of bash.
+Now check the python modules that are installed ( use pip list). How many python packages/modules are installed?
+
+Answer: 3
+
+Question 3
+
+C
+ode
+SELECT
+count(*)
+FROM green_taxi_trips
+WHERE lpep_pickup_datetime::date = '2019-01-15'
+AND lpep_dropoff_datetime::date = '2019-01-15'
+answer 20530
+
+
+Question 4
+
+SELECT
+	lpep_pickup_datetime::date,
+	max(trip_distance)
+FROM green_taxi_trips
+GROUP BY 1
+ORDER BY 2 DESC;
+
+answer:2019-01-15
+
+Question 5
+
+SELECT
+	passenger_count,
+	count(*)
+
+FROM green_taxi_trips
+WHERE lpep_pickup_datetime::date = '2019-01-01'
+GROUP BY 1
+
+Answer: 2: 1282 ; 3:
+
+
+
+Question 6
+
+SELECT
+	z1.zone,
+	z2.zone,
+	max(tip_amount)
+FROM green_taxi_trips as gtt
+JOIN public.dim_zones z1 on z1.locationid = gtt.PULocationID
+JOIN dim_zones z2 on z2.LocationID = gtt.DOLocationID
+WHERE z1.zone = 'Astoria'
+GROUP BY 1,2
+ORDER BY 3 DESC
+
+Answer: Long Island
+
